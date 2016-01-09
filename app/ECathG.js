@@ -11,28 +11,22 @@ var {
   TouchableHighlight
 } = React;
 
-var RNBluetooth = require('react-native').NativeModules.RNBluetooth;
-
 var ECathG = React.createClass({
   getInitialState(){
     return {
       isSearchingDevice: false,
     }
   },
-  searchForDevice(){
+  connectDevice(){
     this.setState({isSearchingDevice: true});
-    RNBluetooth.findDevice((results) => {
-      console.log(results);
-      this.setState({isSearchingDevice: false});
-    });
   },
   render() {
     return (
       <View style={styles.container}>
-        <TouchableHighlight onPress={this.searchForDevice}>
-          {this.state.isSearchingDevice ?
-            <Text style={styles.searching}>Searching...</Text>
-          : <Text style={styles.button}>Search for my device</Text>}
+        <TouchableHighlight onPress={this.connectDevice}>
+          {this.state.isConnecting ?
+            <Text style={styles.connecting}>Connecting...</Text>
+          : <Text style={styles.button}>Connect to my ECG device</Text>}
         </TouchableHighlight>
       </View>
     )
@@ -45,7 +39,7 @@ var styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  searching: {
+  connecting: {
 
   },
   button: {
