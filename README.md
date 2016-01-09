@@ -14,5 +14,7 @@ For the purpose of this demo the native bluetooth won't be implemented. I tried 
 Instead I will use a node server with Johnny-Five and Socket.io to handle the flow of data.
 
 React Native: https://facebook.github.io/react-native/
+
 Johnny-Five: http://johnny-five.io/
+
 Socket.io: http://socket.io/
