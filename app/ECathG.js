@@ -19,6 +19,7 @@ var ECathG = React.createClass({
   },
   connectDevice(){
     this.setState({isSearchingDevice: true});
+    alert('hello');
   },
   render() {
     return (
