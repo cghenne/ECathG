@@ -2,32 +2,47 @@
 
 'use strict';
 
-var React = require('react-native');
-var {
-  AppRegistry,
+let React = require('react-native');
+let SocketIO = require('react-native-swift-socketio');
+
+let {
   StyleSheet,
   Text,
   View,
   TouchableHighlight
 } = React;
 
-var ECathG = React.createClass({
+let ECathG = React.createClass({
   getInitialState(){
     return {
-      isSearchingDevice: false,
+      isAppReady: false,
+      socket: new SocketIO('http://miaou.local:3000', {}),
+      socketState: {status: 'not-connected'},
     }
   },
+  componentDidMount() {
+    this.state.socket.connect();
+    this.state.socket.on('connect', () => {
+      this.setState({socketState: 'connected'});
+    });
+  },
   connectDevice(){
-    this.setState({isSearchingDevice: true});
-    alert('hello');
+    if (this.state.socketState === 'connected') {
+      socket.emit('appIsReady', {});
+      socket.on('ecgValue', function (data) {
+        console.log(data);
+      });
+    } else {
+      console.log('Your server isn\'t running');
+    }
   },
   render() {
     return (
       <View style={styles.container}>
         <TouchableHighlight onPress={this.connectDevice}>
-          {this.state.isConnecting ?
-            <Text style={styles.connecting}>Connecting...</Text>
-          : <Text style={styles.button}>Connect to my ECG device</Text>}
+          {this.state.socketState === 'connected' ?
+            <Text style={styles.connected}>Connected. Have a look at the console!</Text>
+          : <Text style={styles.button}>Start</Text>}
         </TouchableHighlight>
       </View>
     )
@@ -40,7 +55,7 @@ var styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  connecting: {
+  connected: {
 
   },
   button: {

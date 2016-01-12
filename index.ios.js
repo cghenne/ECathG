@@ -1,13 +1,8 @@
 'use strict';
 
-var React = require('react-native');
-var {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-} = React;
+let React = require('react-native');
+let {AppRegistry} = React;
 
-var ECathG = require('./app/ECathG');
+let ECathG = require('./app/ECathG');
 
 AppRegistry.registerComponent('ECathG', () => ECathG);
