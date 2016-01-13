@@ -3,47 +3,52 @@
 'use strict';
 
 let React = require('react-native');
-let SocketIO = require('react-native-swift-socketio');
+let io = require('socket.io-client/socket.io');
 
 let {
   StyleSheet,
   Text,
   View,
-  TouchableHighlight
+  TouchableHighlight,
+  ScrollView,
 } = React;
+
+let EcgValues = require('./components/EcgValues');
 
 let ECathG = React.createClass({
   getInitialState(){
     return {
-      isAppReady: false,
-      socket: new SocketIO('http://miaou.local:3000', {}),
+      socket: io('http://miaou.local:3000'),
       socketState: {status: 'not-connected'},
+      ecgValues: [],
     }
   },
   componentDidMount() {
-    this.state.socket.connect();
     this.state.socket.on('connect', () => {
       this.setState({socketState: 'connected'});
-    });
-  },
-  connectDevice(){
-    if (this.state.socketState === 'connected') {
-      socket.emit('appIsReady', {});
-      socket.on('ecgValue', function (data) {
-        console.log(data);
-      });
-    } else {
-      console.log('Your server isn\'t running');
-    }
+
+      this.state.socket.on('ecgValue', function (data) {
+        let newEcgValues = this.state.ecgValues;
+        newEcgValues.push(data);
+        this.setState({ecgValues: newEcgValues});
+      }.bind(this));
+    }.bind(this));
   },
   render() {
     return (
       <View style={styles.container}>
-        <TouchableHighlight onPress={this.connectDevice}>
+        <TouchableHighlight>
           {this.state.socketState === 'connected' ?
-            <Text style={styles.connected}>Connected. Have a look at the console!</Text>
+            <Text style={styles.connected}>Connected.</Text>
           : <Text style={styles.button}>Start</Text>}
         </TouchableHighlight>
+        {this.state.socketState !== 'connected' ? null :
+          <ScrollView>
+            <View>
+              <EcgValues data={this.state.ecgValues}/>
+            </View>
+          </ScrollView>
+        }
       </View>
     )
   }
@@ -55,9 +60,6 @@ var styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  connected: {
-
-  },
   button: {
     backgroundColor: 'blue',
     color: 'white',
@@ -65,7 +67,10 @@ var styles = StyleSheet.create({
     paddingBottom: 20,
     paddingLeft: 40,
     paddingRight: 40,
-  }
+  },
+  connected: {
+    marginTop: 20,
+  },
 });
 
 module.exports = ECathG;

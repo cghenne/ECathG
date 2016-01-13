@@ -7,18 +7,14 @@
 let SerialPort = require('serialport').SerialPort
 let httpServer = require('http').createServer();
 let io = require('socket.io')(httpServer);
+let port = 3000;
 
-httpServer.listen(3000);
+httpServer.listen(port);
 
 let socket = null;
-let isAppReady = false;
 
 io.on('connection', mySocket => {
   socket = mySocket;
-
-  socket.on('appIsReady', () => {
-    isAppReady = true;
-  });
 });
 
 let buffer = [];
@@ -36,10 +32,14 @@ serialPort.on("open", function () {
 
 
 function sendToReactNative(valueX, valueY) {
-  if (socket && isAppReady) {
-    socket.emit('ecgValue', {valueX: valueX, valueY: valueX});
+  if (socket) {
+    socket.emit('ecgValue', {
+      valueX: valueX,
+      valueY: valueY,
+    });
+    console.log(valueX, valueY);
   } else {
-    console.log('Socket or App isn\'t ready yet');
+    console.log('Socket isn\'t ready yet');
   }
 }
 

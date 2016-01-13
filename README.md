@@ -2,6 +2,7 @@
 
 
 ## Hardware
+
 Arduino Micro: http://befr.rs-online.com/web/p/processor-microcontroller-development-kits/7717667/
 
 Olimex EKG Shield: https://www.olimex.com/Products/Duino/Shields/SHIELD-EKG-EMG/
@@ -22,8 +23,8 @@ SerialPort: https://github.com/voodootikigod/node-serialport
 Socket.io: http://socket.io/
 
 
-## React Native App
+### React Native App
 
 React Native: https://facebook.github.io/react-native/
 
-Socket.io for React Native: https://github.com/kirkness/react-native-swift-socketio
+Socket.io client with React Native: http://browniefed.com/blog/2015/05/16/react-native-and-socket-dot-io/
