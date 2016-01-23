@@ -1,5 +1,4 @@
 // ECathG.js
-
 'use strict';
 
 let React = require('react-native');
@@ -10,45 +9,53 @@ let {
   Text,
   View,
   TouchableHighlight,
-  ScrollView,
 } = React;
 
-let EcgValues = require('./components/EcgValues');
+let EcgLine = require('./components/EcgLine');
 
 let ECathG = React.createClass({
+  getDefaultEcg() {
+    let defaultEcg = [];
+
+    for (let i = 0; i < 500; i++) {
+      defaultEcg.push({0, 0});
+    }
+
+    return defaultEcg;
+  },
   getInitialState(){
     return {
       socket: io('http://miaou.local:3000'),
-      socketState: {status: 'not-connected'},
-      ecgValues: [],
+      isSocketConnected: false,
+      isDeviceConnected: false,
+      ecgValues: getDefaultEcg(),
     }
   },
   componentDidMount() {
     this.state.socket.on('connect', () => {
-      this.setState({socketState: 'connected'});
-
-      this.state.socket.on('ecgValue', function (data) {
-        let newEcgValues = this.state.ecgValues;
-        newEcgValues.push(data);
-        this.setState({ecgValues: newEcgValues});
+      this.setState({isSocketConnected: true});
+      this.state.socket.on('ecgValues', function (data) {
+        let newValues = this.state.ecgValues.splice(0, 50, data);
+        this.setState({isDeviceConnected: true, ecgValues: newValues});
       }.bind(this));
     }.bind(this));
+  },
+  connectDevice() {
+    // here we can retry a connection to the device
   },
   render() {
     return (
       <View style={styles.container}>
-        <TouchableHighlight>
-          {this.state.socketState === 'connected' ?
-            <Text style={styles.connected}>Connected.</Text>
-          : <Text style={styles.button}>Start</Text>}
-        </TouchableHighlight>
-        {this.state.socketState !== 'connected' ? null :
-          <ScrollView>
-            <View>
-              <EcgValues data={this.state.ecgValues}/>
-            </View>
-          </ScrollView>
+        <View style={styles.connectivity}>
+          <Text>Socket: {this.state.isSocketConnected ? 'connected' : 'disconnected'}</Text>
+          <Text>Device: {this.state.isDeviceConnected ? 'connected' : 'disconnected'}</Text>
+        </View>
+        {!this.state.isSocketConnected ? <Text>There's an issue with the node server.</Text>
+        : <TouchableHighlight onPress={this.connectDevice}>
+            <Text style={styles.button}>Connect</Text>
+          </TouchableHighlight>
         }
+        <EcgLine ecgValues={this.state.ecgValues}/>
       </View>
     )
   }
@@ -68,7 +75,7 @@ var styles = StyleSheet.create({
     paddingLeft: 40,
     paddingRight: 40,
   },
-  connected: {
+  connectivity: {
     marginTop: 20,
   },
 });

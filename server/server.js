@@ -4,54 +4,37 @@
 // with the device using node-serialport and then will send the data to the react native app
 // using socket.io
 
-let SerialPort = require('serialport').SerialPort
-let httpServer = require('http').createServer();
-let io = require('socket.io')(httpServer);
-let port = 3000;
 
-httpServer.listen(port);
+const config = require('./config');
+const socket = require('./connectors/websockets');
+const serial = require('./connectors/serial');
 
-let socket = null;
+socket.listen(config.socketPort);
+serial.connect(config.device, config.baudrate, handleData);
 
-io.on('connection', mySocket => {
-  socket = mySocket;
-});
+// We want to create a packet of [packetSize] values to send to the front end
+// 1 value = {x: data point - y: ecg value}
+// the serial connection sends back a flow of bytes with the first one being 170
+// and the ecg value coded on the second and third one
 
-let buffer = [];
-let countPoint = 0;
+const buffer = require('./data/buffer');
+const packet = require('./data/packet');
 
-let serialPort = new SerialPort('/dev/cu.HC-06-DevB', {
-  baudrate: 9600
-});
-
-serialPort.on("open", function () {
-  serialPort.on('data', function(data) {
-    handleData(data);
-  });
-});
-
-
-function sendToReactNative(valueX, valueY) {
-  if (socket) {
-    socket.emit('ecgValue', {
-      valueX: valueX,
-      valueY: valueY,
-    });
-    console.log(valueX, valueY);
-  } else {
-    console.log('Socket isn\'t ready yet');
-  }
-}
+packet.initPacket(config.packetSize);
 
 function handleData(data) {
   if (data) {
     let vals = new Uint8Array(data);
     for (let i = 0; i < vals.length; i++) {
-      buffer.push(vals[i]);
-      if (buffer.length === 3) {
-        let ecgValue = (buffer[1]<<8) + buffer[2];
-        sendToReactNative(countPoint++, ecgValue);
-        buffer = [];
+      buffer.addData(vals[i]);
+      let ecgValue = buffer.getEcgValue();
+
+      if (ecgValue) {
+        if (packet.addData(ecgValue)) {
+          if (!socket.emitEvent('ecgValues', packet.exportData())) {
+            console.log('Socket isn\'t ready yet');
+          }
+        }
       }
     };
   }
