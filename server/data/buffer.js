@@ -1,5 +1,4 @@
 'use strict';
-// there s an error on the logic here still
 
 let buffer = [];
 let countPoint = 0;

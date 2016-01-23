@@ -2,7 +2,6 @@
 
 const SerialPort = require('serialport').SerialPort;
 let serialConnection = null;
-let errorMessage = '';
 
 let connect = (device, baudrate, callback) => {
   serialConnection = new SerialPort(device, {baudrate: baudrate}, false);
@@ -20,10 +19,6 @@ let connect = (device, baudrate, callback) => {
 
 let isOpen = () => {
   return serialConnection.isOpen();
-}
-
-let getErrorMessage = () => {
-  return errorMessage;
 }
 
 exports.connect = connect;
