@@ -1,14 +1,10 @@
 'use strict';
 
 let buffer = [];
-let countPoint = 0;
 
 let getEcgValue = () => {
   if (buffer.length === 2) {
-    let valX = (buffer[0] << 8) + buffer[1];
-    let valY = countPoint;
-    countPoint += 1;
-    return {valX, valY};
+    return (buffer[0] << 8) + buffer[1];
   } else {
     return null;
   }

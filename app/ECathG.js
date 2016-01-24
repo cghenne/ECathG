@@ -16,9 +16,8 @@ let EcgLine = require('./components/EcgLine');
 let ECathG = React.createClass({
   getDefaultEcg() {
     let defaultEcg = [];
-
-    for (let i = 0; i < 500; i++) {
-      defaultEcg.push({0, 0});
+    for (let i = 0; i < 300; i++) {
+      defaultEcg.push(0);
     }
 
     return defaultEcg;
@@ -28,15 +27,14 @@ let ECathG = React.createClass({
       socket: io('http://miaou.local:3000'),
       isSocketConnected: false,
       isDeviceConnected: false,
-      ecgValues: getDefaultEcg(),
+      ecgValues: this.getDefaultEcg(),
     }
   },
   componentDidMount() {
     this.state.socket.on('connect', () => {
       this.setState({isSocketConnected: true});
       this.state.socket.on('ecgValues', function (data) {
-        let newValues = this.state.ecgValues.splice(0, 50, data);
-        this.setState({isDeviceConnected: true, ecgValues: newValues});
+        this.setState({isDeviceConnected: true, ecgValues: data});
       }.bind(this));
     }.bind(this));
   },
@@ -51,9 +49,10 @@ let ECathG = React.createClass({
           <Text>Device: {this.state.isDeviceConnected ? 'connected' : 'disconnected'}</Text>
         </View>
         {!this.state.isSocketConnected ? <Text>There's an issue with the node server.</Text>
-        : <TouchableHighlight onPress={this.connectDevice}>
+        : !this.state.isDeviceConnected ?
+          <TouchableHighlight onPress={this.connectDevice}>
             <Text style={styles.button}>Connect</Text>
-          </TouchableHighlight>
+          </TouchableHighlight> : null
         }
         <EcgLine ecgValues={this.state.ecgValues}/>
       </View>
@@ -61,7 +60,7 @@ let ECathG = React.createClass({
   }
 });
 
-var styles = StyleSheet.create({
+let styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
