@@ -15,20 +15,20 @@ let {
 // let EcgLine = require('./components/EcgLine');
 
 let ECathG = React.createClass({
-  getDefaultEcg() {
+  /*getDefaultEcg() {
     let defaultEcg = [];
     for (let i = 0; i < 300; i++) {
       defaultEcg.push(0);
     }
 
     return defaultEcg;
-  },
+  },*/
   getInitialState(){
     return {
       socket: io('http://miaou.local:3000'),
       isSocketConnected: false,
       isDeviceConnected: false,
-      ecgValues: this.getDefaultEcg(),
+      /* ecgValues: this.getDefaultEcg(), */
     }
   },
   componentDidMount() {
