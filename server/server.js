@@ -30,7 +30,6 @@ function handleData(data) {
       if (ecgValue) {
         if (packet.addData(ecgValue)) {
           let ecgPacket = packet.exportData();
-          console.log(ecgPacket);
           if (!socket.emitEvent('ecgValues', ecgPacket)) {
             console.log('Socket isn\'t ready yet');
           }

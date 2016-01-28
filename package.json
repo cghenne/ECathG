@@ -6,6 +6,7 @@
     "start": "react-native start"
   },
   "dependencies": {
+    "fft-js": "0.0.9",
     "react-native": "^0.13.2",
     "react-native-svg-elements": "0.0.21",
     "serialport": "^2.0.6",
